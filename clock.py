@@ -1,17 +1,14 @@
 import json
+import time
 from licsber.wisedu.get_session import *
-from licsber.spider import get_session
-from vpn import NJITwebvpn
-from webvpn import getVPNUrl
+import schedule
+
 
 #信息门户账号,密码,手机号 (必填)
-EHALL_USER = ''
-EHALL_PWD = ''
-PHONE_NUMBER = ''
+EHALL_USER = '206200722'
+EHALL_PWD = '2575318672.qwer'
+PHONE_NUMBER = '13024487252'
 
-s = get_session()
-vpn = NJITwebvpn(EHALL_USER,EHALL_PWD)
-s = vpn.login()
 
 LOGIN_URL = 'http://authserver.njit.edu.cn/authserver/login?service=http%3A%2F%2Fehall.njit.edu.cn%2Flogin%3Fservice%3Dhttp%3A%2F%2Fehall.njit.edu.cn%2Fnew%2Findex.html'
 GET_URL = 'http://ehallapp.njit.edu.cn/publicapp/sys/lwNjitHealthInfoDailyClock/index.do#/healthClock'
@@ -21,15 +18,9 @@ SAVE_URL = 'http://ehallapp.njit.edu.cn/publicapp/sys/lwNjitHealthInfoDailyClock
 
 URL_DICT = { 'LOGIN_URL': LOGIN_URL, 'GET_URL': GET_URL, 'QUERY_URL': QUERY_URL, 'TIME_URL': TIME_URL, 'SAVE_URL': SAVE_URL }
 
-#套了一层webvpn进行加速，如果不需要就注释掉
-#webvpn: 伪内网访问
-for k,v in URL_DICT.items():
-    URL_DICT[k] = getVPNUrl(v)
-
-s = get_wisedu_session_webvpn(URL_DICT['LOGIN_URL'], EHALL_USER, EHALL_PWD, s)
 
 #公网访问(二选一)
-#s = get_wisedu_session(URL_DICT['LOGIN_URL'], EHALL_USER, EHALL_PWD)
+s = get_wisedu_session(URL_DICT['LOGIN_URL'], EHALL_USER, EHALL_PWD)
 
 s.get(URL_DICT['GET_URL'])
 
@@ -70,9 +61,21 @@ data_am = {
 data_pm = data_am.copy()
 data_pm['BY3'] = '002'
 
-#上午打卡
-res = s.post(URL_DICT['SAVE_URL'], data=data_am)
-#下午打卡
-#res = s.post(URL_DICT['SAVE_URL'], data=data_pm)
 
-print(res.text)
+
+#上午打卡
+def morning():
+    res = s.post(URL_DICT['SAVE_URL'], data=data_am)
+    print(res.text)
+#下午打卡
+def afternoon():
+    res = s.post(URL_DICT['SAVE_URL'], data=data_pm)
+    print(res.text)
+
+schedule.every().day.at("07:30").do(morning)
+schedule.every().day.at("13:30").do(afternoon)
+
+while 1:
+    schedule.run_pending()
+    time.sleep(1)
+
