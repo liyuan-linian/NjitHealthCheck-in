@@ -5,9 +5,9 @@ import schedule
 
 
 #信息门户账号,密码,手机号 (必填)
-EHALL_USER = '206200722'
-EHALL_PWD = '2575318672.qwer'
-PHONE_NUMBER = '13024487252'
+EHALL_USER = ''
+EHALL_PWD = ''
+PHONE_NUMBER = ''
 
 
 LOGIN_URL = 'http://authserver.njit.edu.cn/authserver/login?service=http%3A%2F%2Fehall.njit.edu.cn%2Flogin%3Fservice%3Dhttp%3A%2F%2Fehall.njit.edu.cn%2Fnew%2Findex.html'
